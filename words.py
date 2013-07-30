@@ -1,9 +1,7 @@
-from listed import *
+from listed import get_item_iter, flatten
 import re
 from stemming.porter2 import stem
 import sys
-import json
-from listed import *
 
 def get_words(item):
     item_words = item['title'].split() + item['description'].split()
@@ -54,10 +52,10 @@ def main():
     words = [ get_normalized_words(item) for item in items]
     words = flatten(words)
     counts = count(words)
-    top_word_counts = counts[1:int(sys.argv[2])]
+    top_word_counts = counts[0:int(sys.argv[2])]
     top_words = map(lambda x: x[0], top_word_counts)
-    json_data = json.dumps(top_words)
-    print json_data
+    for (idx, word) in zip(range(len(top_words)), top_words):
+        print "%d,%s" % (idx, word)
 
 if __name__ == '__main__':
     main()

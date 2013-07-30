@@ -4,11 +4,11 @@ clean:
 	rm -f *.pyc *.vec *.json *.mat
 
 #TODO MAKE FEATURES A VAR.
-top_words.json:
-	python ./words.py ./all_items_listed.csv 10000 > top_words.json
+top_words.csv:
+	python ./words.py ./all_items_listed.csv 10 > top_words.csv
 
-listed.vec: top_words.json
-	python ./vectorize.py ./top_words.json ./all_items_listed.csv > listed.vec
+listed.vec: top_words.csv
+	python ./vectorize.py ./top_words.csv ./all_items_listed.csv > listed.vec
 
 tags.vec:
 	python ./tags.py ./tagged_items.csv | sort -n  > tags.vec

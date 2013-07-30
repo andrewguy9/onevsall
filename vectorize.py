@@ -1,13 +1,12 @@
 import sys
-import json
 from listed import get_item_iter
 from words import get_normalized_words
+from join_csv import create_table
 
 
 def main():
     words_f = open(sys.argv[1], 'r')
-    json_data = words_f.read()
-    top_words = json.loads(json_data)
+    top_words = create_table(words_f, 1)
     items = get_item_iter(sys.argv[2])
     for item in items:
         item_words = set(get_normalized_words(item))
