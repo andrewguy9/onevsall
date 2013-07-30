@@ -1,4 +1,4 @@
-all: predictions.csv
+all: tags.vec item_predictions.csv
 
 clean: 
 	rm -f *.pyc *.vec *.json *.mat
@@ -11,9 +11,12 @@ listed.vec: top_words.json
 	python ./vectorize.py ./top_words.json ./all_items_listed.csv > listed.vec
 
 tags.vec:
-	python ./tag.py ./tagged_items.csv > tags.vec
+	python ./tags.py ./tagged_items.csv | sort -n  > tags.vec
 
-tags_listed.vec: listed.vec tags.vec
+training_tags.vec:
+	python ./tag.py ./tagged_items.csv > training_tags.vec
+
+tags_listed.vec: listed.vec training_tags.vec
 	./join_csv.py --data tags.vec listed.vec --keys 0 0 > tags_listed.vec
 	
 #TODO 22 should be calculated
@@ -21,5 +24,5 @@ tags_listed.vec: listed.vec tags.vec
 theta.mat: tags_listed.vec
 	octave ./calc_theta.m  ./tags_listed.vec 22 100 theta.mat
 
-predictions.csv: theta.mat listed.vec
-	octave ./calc_predictions.m ./listed.vec theta.mat predictions.csv
+item_predictions.csv: theta.mat listed.vec
+	octave ./calc_predictions.m ./listed.vec theta.mat item_predictions.csv
