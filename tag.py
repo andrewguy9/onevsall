@@ -16,7 +16,7 @@ def get_tags_iter(path, tags):
 def main():
     tags = get_tags(sys.argv[1])
     for item in get_tags_iter(sys.argv[1], tags):
-        print ", ".join(item)
+        print ",".join(item)
 
 if __name__ == '__main__':
     main()

@@ -22,7 +22,7 @@ def get_tags(path):
 def main():
     tags = get_tags(sys.argv[1])
     for tag, id in tags.items():
-        print id, ", ", tag
+        print "%d,%s"%(id,tag)
 
 if __name__ == '__main__':
     main()

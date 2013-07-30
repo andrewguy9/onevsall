@@ -17,7 +17,7 @@ def main():
                 item_vec.append("1")
             else:
                 item_vec.append("0")
-        print ", ".join(item_vec)
+        print ",".join(item_vec)
 
 if __name__ == '__main__':
     main()
