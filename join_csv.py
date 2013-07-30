@@ -20,22 +20,29 @@ parser = ArgumentParser()
 parser.add_argument("base", help="table to start with")
 parser.add_argument("join_arg", type=join_arg, nargs='+', help="file.csv:left_key_index:right_key_index")
 
-def create_table(f, key_index):
+def create_table(f):
     r = reader(f)
-    data = {}
+    table = []
     for record in r:
+        table.append(record)
+    return table
+
+def create_table_with_index(f, key_index):
+    table = create_table(f)
+    index = {}
+    for record in table:
         key = record[key_index]
-        data[key] = record
-    return data
+        index[key] = record
+    return index
 
 
 def main():
     args = parser.parse_args()
     with open(args.base, 'r') as accum_f:
-        accum = create_table(accum_f, 0).values()
+        accum = create_table(accum_f)
     for (table_name,left_index,right_index) in args.join_arg:
         with open(table_name, 'r') as f:
-            table = create_table(f, right_index)
+            table = create_table_with_index(f, right_index)
             for record in accum:
                 accum_key = record[left_index]
                 right_record = table[accum_key]
