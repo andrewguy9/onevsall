@@ -9,11 +9,8 @@ def get_tags_iter(path, tags):
     for item in items:
         (title, tag, price, id) = item
         tag_id = tags[tag]
-        vec = [ id ]
-        before = ["0"] * (tag_id-1)
-        during = ["1"]
-        after = ["0"] * (len(tags) - tag_id) 
-        yield vec + before+during+after
+        vec = [ id, str(tag_id) ]
+        yield vec
 
 def get_tags(path):
     f = open(path, 'r')
