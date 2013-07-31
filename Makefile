@@ -1,28 +1,39 @@
-all: tags.vec item_predictions.vec
+NUM_FEATURES=1000
+MAX_ITER=400
+TRAINING_PERCENT=10
+
+all: check_predictions.txt
 
 clean: 
 	rm -f *.pyc *.vec *.json *.mat
 
-#TODO MAKE FEATURES A VAR.
-top_words.csv:
-	python ./words.py ./all_items_listed.csv 10 > top_words.csv
+top_words.vec:
+	python ./words.py ./all_items_listed.csv ${NUM_FEATURES} > top_words.vec
 
-listed.vec: top_words.csv
-	python ./vectorize.py ./top_words.csv ./all_items_listed.csv > listed.vec
+listed.vec: top_words.vec
+	python ./vectorize.py ./top_words.vec ./all_items_listed.csv > listed.vec
 
 tags.vec:
 	python ./tags.py ./tagged_items.csv | sort -n  > tags.vec
 
-training_tags.vec:
-	python ./tag.py ./tagged_items.csv > training_tags.vec
+tagged_items.vec:
+	python ./tag.py ./tagged_items.csv > tagged_items.vec
+
+training_tags.vec: tagged_items.vec
+	./split_tags.sh ./tagged_items.vec testing_tags.vec training_tags.vec ${TRAINING_PERCENT}
+
+testing_tags.vec: tagged_items.vec
+	./split_tags.sh ./tagged_items.vec testing_tags.vec training_tags.vec ${TRAINING_PERCENT}
 
 tags_listed.vec: listed.vec training_tags.vec
 	./join_csv.py training_tags.vec listed.vec:0:0 > tags_listed.vec
-	
-#TODO 22 should be calculated
-#TODO 1 SHOULD BE A VAR
-theta.mat: tags_listed.vec
-	octave ./calc_theta.m  ./tags_listed.vec 22 400 theta.mat
+
+#TODO MAKE 22 A PARAMETER
+theta.mat: tags_listed.vec tags.vec
+	octave ./calc_theta.m  ./tags_listed.vec 22 ${MAX_ITER} theta.mat
 
 item_predictions.vec: theta.mat listed.vec
 	octave ./calc_predictions.m ./listed.vec theta.mat item_predictions.vec
+
+check_predictions.txt: item_predictions.vec testing_tags.vec
+	./join_csv.py testing_tags.vec item_predictions.vec:0:0 | tr "," " " | awk 'BEGIN{good=0; bad = 0}{if($$2==$$3){good++}else{bad++}}END{print good,bad,int(100*good/(good+bad))"%"}' | tee check_predictions.txt
