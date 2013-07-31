@@ -1,6 +1,6 @@
 NUM_FEATURES=1000
 MAX_ITER=400
-TRAINING_PERCENT=10
+TRAINING_PERCENT=100
 
 all: check_predictions.txt
 
@@ -20,10 +20,10 @@ tagged_items.vec:
 	python ./tag.py ./tagged_items.csv > tagged_items.vec
 
 training_tags.vec: tagged_items.vec
-	./split_tags.sh ./tagged_items.vec testing_tags.vec training_tags.vec ${TRAINING_PERCENT}
+	./split_tags.sh ./tagged_items.vec training_tags.vec testing_tags.vec ${TRAINING_PERCENT}
 
 testing_tags.vec: tagged_items.vec
-	./split_tags.sh ./tagged_items.vec testing_tags.vec training_tags.vec ${TRAINING_PERCENT}
+	./split_tags.sh ./tagged_items.vec training_tags.vec testing_tags.vec ${TRAINING_PERCENT}
 
 tags_listed.vec: listed.vec training_tags.vec
 	./join_csv.py training_tags.vec listed.vec:0:0 > tags_listed.vec
