@@ -1,12 +1,12 @@
 import sys
 from listed import get_item_iter
 from words import get_normalized_words
-from join_csv import create_table
+from join_csv import create_table_with_index
 
 
 def main():
     words_f = open(sys.argv[1], 'r')
-    top_words = create_table(words_f, 1)
+    top_words = create_table_with_index(words_f, 1)
     items = get_item_iter(sys.argv[2])
     for item in items:
         item_words = set(get_normalized_words(item))
