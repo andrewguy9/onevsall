@@ -2,7 +2,8 @@
 
 import argparse
 from argparse import ArgumentParser
-from csv import reader
+from csv import reader, writer
+from sys import stdout
 
 def join_arg(string):
     try:
@@ -49,8 +50,9 @@ def main():
                 before = right_record[:right_index]
                 after = right_record[(right_index+1):]
                 record.extend(before+after)
+    out = writer(stdout)
     for record in accum:
-        print ", ".join(map(str,record))
+        out.writerow(map(str, record))
 
 if __name__ == '__main__':
     main()
