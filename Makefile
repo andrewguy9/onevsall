@@ -1,8 +1,10 @@
 NUM_FEATURES=1000
 MAX_ITER=400
 TRAINING_PERCENT=100
+TAGS=`wc -l tags.vec  | awk '{print $$1}'`
 
 all: check_predictions.txt
+
 
 clean: 
 	rm -f *.pyc *.vec *.json *.mat
@@ -28,9 +30,8 @@ testing_tags.vec: tagged_items.vec
 tags_listed.vec: listed.vec training_tags.vec
 	./join_csv.py training_tags.vec listed.vec:0:0 > tags_listed.vec
 
-#TODO MAKE 22 A PARAMETER
 theta.mat: tags_listed.vec tags.vec
-	octave ./calc_theta.m  ./tags_listed.vec 22 ${MAX_ITER} theta.mat
+	octave ./calc_theta.m  ./tags_listed.vec ${TAGS} ${MAX_ITER} theta.mat
 
 item_predictions.vec: theta.mat listed.vec
 	octave ./calc_predictions.m ./listed.vec theta.mat item_predictions.vec
