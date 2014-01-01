@@ -6,7 +6,7 @@ TAGS=`wc -l tags.vec  | awk '{print $$1}'`
 all: check_predictions.txt
 
 
-clean: 
+clean:
 	rm -f *.pyc *.vec *.json *.mat
 
 top_words.vec:
