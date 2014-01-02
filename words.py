@@ -10,14 +10,12 @@ def get_words(fields, item):
         for word in words:
             yield word
 
-def get_normalized_words(fields, item):
-    for word in get_words(fields, item):
+def normalize_words(words):
+    for word in words:
         try:
-            word = normalize(word)
+            yield normalize(word)
         except ValueError:
             pass
-        else:
-            yield word
 
 strip_punct = re.compile("^[a-z]+")
 def normalize(word):
@@ -50,14 +48,13 @@ def reverse(t):
 
 def main():
     args = parser.parse_args()
-    item_iters = []
     fields = args.fields.split(',')
-    for f in args.files:
-        item_iters.append(get_item_iter(f))
+    item_iters = [get_item_iter(f) for f in args.files]
     items = flatten(item_iters)
-    item_texts = imap(lambda item: get_normalized_words(fields, item), items)
-    words = flatten(item_texts)
-    counts = count(words)
+    items_words = imap(lambda item: get_words(fields, item), items)
+    words = flatten(items_words)
+    normalized_words = normalize_words(words)
+    counts = count(normalized_words)
     top_word_counts = counts[0:int(args.count)]
     top_words = map(lambda x: x[0], top_word_counts)
     for (idx, word) in zip(range(len(top_words)), top_words):
