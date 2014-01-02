@@ -4,13 +4,14 @@ import re
 from stemming.porter2 import stem
 from itertools import imap
 
-def get_words(item):
-    item_words = item['title'].split() + item['description'].split()
-    for word in item_words:
-        yield word
+def get_words(fields, item):
+    for field in fields:
+        words = item[field].split()
+        for word in words:
+            yield word
 
-def get_normalized_words(item):
-    for word in get_words(item):
+def get_normalized_words(fields, item):
+    for word in get_words(fields, item):
         try:
             word = normalize(word)
         except ValueError:
@@ -50,10 +51,11 @@ def reverse(t):
 def main():
     args = parser.parse_args()
     item_iters = []
+    fields = args.fields.split(',')
     for f in args.files:
         item_iters.append(get_item_iter(f))
     items = flatten(item_iters)
-    item_texts = imap(get_normalized_words, items)
+    item_texts = imap(lambda item: get_normalized_words(fields, item), items)
     words = flatten(item_texts)
     counts = count(words)
     top_word_counts = counts[0:int(args.count)]
@@ -63,7 +65,7 @@ def main():
 
 parser = argparse.ArgumentParser()
 parser.add_argument('count', type=int, help='number of words to track')
-parser.add_argument('text_fields', help='indexes to extract from csv.')
+parser.add_argument('fields', help='comma separated list of fields to extract.')
 parser.add_argument('files', nargs='*', help='file to parse')
 if __name__ == '__main__':
     main()
