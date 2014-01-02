@@ -55,7 +55,13 @@ def main():
     words = flatten(items_words)
     normalized_words = normalize_words(words)
     counts = count(normalized_words)
-    top_word_counts = counts[0:int(args.count)]
+    if args.exclude:
+        with open(args.exclude, 'r') as f:
+            exclude = set([w for w in f.read().split('\n')])
+            filtered_counts = filter(lambda w: w[0] not in exclude, counts)
+    else:
+        filtered_counts = counts
+    top_word_counts = filtered_counts[0:int(args.count)]
     top_words = map(lambda x: x[0], top_word_counts)
     for (idx, word) in zip(range(len(top_words)), top_words):
         print "%d,%s" % (idx, word)
@@ -64,5 +70,6 @@ parser = argparse.ArgumentParser()
 parser.add_argument('count', type=int, help='number of words to track')
 parser.add_argument('fields', help='comma separated list of fields to extract.')
 parser.add_argument('files', nargs='*', help='file to parse')
+parser.add_argument('--exclude', help='file with list of stop words to exclude')
 if __name__ == '__main__':
     main()
