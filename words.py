@@ -32,9 +32,9 @@ def count(i):
     uniq = {}
     for item in i:
         try:
-            uniq[item]+=1
+            uniq[item] += 1
         except KeyError:
-            uniq[item]=1
+            uniq[item] = 1
     items = uniq.items()
     items = map(reverse, items)
     items = sorted(items)
@@ -43,13 +43,13 @@ def count(i):
     return items
 
 def reverse(t):
-    (a,b) = t
-    return (b,a)
+    (a, b) = t
+    return (b, a)
 
 def main():
     item_iter = get_item_iter(sys.argv[1])
-    items = [ i for i in item_iter]
-    words = [ get_normalized_words(item) for item in items]
+    items = [i for i in item_iter]
+    words = [get_normalized_words(item) for item in items]
     words = flatten(words)
     counts = count(words)
     top_word_counts = counts[0:int(sys.argv[2])]
@@ -59,4 +59,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
