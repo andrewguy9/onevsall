@@ -7,14 +7,14 @@ from sys import stdout
 
 def join_arg(string):
     try:
-        (table,left_key, right_key) = string.split(":")
+        (table, left_key, right_key) = string.split(":")
         table = str(table)
         left_key = int(left_key)
         right_key = int(right_key)
     except Exception:
         raise argparse.ArgumentTypeError("format is file:left_key:right_key")
     else:
-        return (table,left_key, right_key)
+        return (table, left_key, right_key)
 
 # fileA fileB keyA keyB fileC keyC keyD
 parser = ArgumentParser()
@@ -39,7 +39,7 @@ def create_index(table, key_index):
 
 def left_join(left, left_key, right_index, right_key):
     accum = []
-    # print "&&& running key %d &&&" % left_key 
+    # print "&&& running key %d &&&" % left_key
     for record in left:
         row = []
         row += record
@@ -66,7 +66,7 @@ def main():
         accum = create_table(accum_f)
     # print "***Start table***"
     # print_table(accum, stdout)
-    for (table_name,left_index,right_index) in args.join_arg:
+    for (table_name, left_index, right_index) in args.join_arg:
         with open(table_name, 'r') as f:
             table = create_table(f)
             # print "***right table table***"
