@@ -10,7 +10,7 @@ clean:
 	rm -f *.pyc *.vec *.json *.mat *.debug
 
 top_words.vec:
-	python ./words.py ${NUM_FEATURES} title,description all_items_listed.csv > top_words.vec
+	python ./words.py --exclude stop_words.csv --output top_words.vec ${NUM_FEATURES} title,description all_items_listed.csv
 
 listed.vec: top_words.vec
 	python ./vectorize.py ./top_words.vec ./all_items_listed.csv > listed.vec

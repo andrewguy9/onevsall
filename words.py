@@ -3,6 +3,9 @@ from listed import get_item_iter, flatten
 import re
 from stemming.porter2 import stem
 from itertools import imap
+from tempfile import NamedTemporaryFile
+from os import rename
+from sys import stdout
 
 def get_words(fields, item):
     for field in fields:
@@ -63,13 +66,21 @@ def main():
         filtered_counts = counts
     top_word_counts = filtered_counts[0:int(args.count)]
     top_words = map(lambda x: x[0], top_word_counts)
+    if args.output:
+        out_h = NamedTemporaryFile()
+    else:
+        out_h = stdout
     for (idx, word) in zip(range(len(top_words)), top_words):
-        print "%d,%s" % (idx, word)
+        print >>out_h, "%s,%s" % (idx, word)
+    if out_h != stdout:
+        rename(out_h.name, args.output)
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('count', type=int, help='number of words to track')
 parser.add_argument('fields', help='comma separated list of fields to extract.')
 parser.add_argument('files', nargs='*', help='file to parse')
 parser.add_argument('--exclude', help='file with list of stop words to exclude')
+parser.add_argument('--output', help='output file path')
 if __name__ == '__main__':
     main()
