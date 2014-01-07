@@ -13,7 +13,7 @@ top_words.vec:
 	python ./words.py --exclude stop_words.csv --output top_words.vec ${NUM_FEATURES} title,description all_items_listed.csv
 
 listed.vec: top_words.vec
-	python ./vectorize.py ./top_words.vec ./all_items_listed.csv > listed.vec
+	python ./vectorize.py --output listed.vec ./top_words.vec title,description ./all_items_listed.csv
 
 tags.vec:
 	python ./tags.py ./tagged_items.csv | sort -n  > tags.vec

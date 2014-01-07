@@ -1,23 +1,37 @@
-import sys
-from listed import get_item_iter
-from words import get_normalized_words
 from join_csv import create_table, create_index
+from listed import get_item_iter
+from os import rename
+from sys import stdout
+from tempfile import NamedTemporaryFile
+from words import get_words, normalize_words
+import argparse
 
-
+parser = argparse.ArgumentParser()
+parser.add_argument('--output', help='Output file path')
+parser.add_argument('words', help='list of words to use')
+parser.add_argument('fields', help='items')
+parser.add_argument('items', help='items')
 def main():
-    words_f = open(sys.argv[1], 'r')
-    top_words = create_index(create_table(words_f), 1)
-    items = get_item_iter(sys.argv[2])
+    args = parser.parse_args()
+    words_f = open(args.words, 'r')
+    top_words = create_table(words_f)
+    items = get_item_iter(args.items)
+    if args.output:
+        out_h = NamedTemporaryFile()
+    else:
+        out_h = stdout
     for item in items:
-        item_words = set(get_normalized_words(item))
+        item_words = get_words(args.fields.split(','), item)
+        norm_item_words = list(normalize_words(item_words))
         item_vec = [str(item['id'])]
-        for word in top_words:
-            if word in item_words:
+        for idx, word in top_words:
+            if word in norm_item_words:
                 item_vec.append("1")
             else:
                 item_vec.append("0")
-        print ",".join(item_vec)
+        print >>out_h, ",".join(item_vec)
+    if out_h != stdout:
+        rename(out_h.name, args.output)
 
 if __name__ == '__main__':
     main()
-
