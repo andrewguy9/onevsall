@@ -1,28 +1,29 @@
-from csv import reader
-from listed import tail
-import sys
+from sys import stdout
+from os import rename
+from tempfile import NamedTemporaryFile
+import argparse
+from join_csv import table
 
 def get_tags(path):
-    f = open(path, 'r')
-    r = reader(f)
-    items = tail(r)
-    tag_max = 0
-    tags = {}
-    for item in items:
-        (title, tag, price, id) = item
-        # print item
-        try:
-            tag_id = tags[tag]
-        except KeyError:
-            tag_id = tag_max
-            tags[tag] = tag_id
-            tag_max += 1
-    return tags
+    tags = set()
+    for item in table(path).dict_cursor():
+        tags.add(item['tag'])
+    return sorted(tags)
 
+parser = argparse.ArgumentParser()
+parser.add_argument('--output', help='file to write to')
+parser.add_argument('tagged_items', help='File to extract tags from')
 def main():
-    tags = get_tags(sys.argv[1])
-    for tag, id in tags.items():
-        print "%d,%s"%(id,tag)
+    args = parser.parse_args()
+    tagged_items = get_tags(args.tagged_items)
+    if args.output:
+        out_h = NamedTemporaryFile()
+    else:
+        out_h = stdout
+    for id, tag in enumerate(tagged_items):
+        print >>out_h, "%d,%s" % (id, tag)
+    if out_h != stdout:
+        rename(out_h.name, args.output)
 
 if __name__ == '__main__':
     main()
