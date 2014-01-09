@@ -19,7 +19,7 @@ tags.vec:
 	python ./tags.py --output tags.vec ./tagged_items.csv
 
 tagged_items.vec:
-	python ./tag.py ./tagged_items.csv > tagged_items.vec
+	python ./tag.py --output tagged_items.vec ./tagged_items.csv
 
 training_tags.vec: tagged_items.vec
 	./split_tags.sh ./tagged_items.vec training_tags.vec testing_tags.vec ${TRAINING_PERCENT}
@@ -28,7 +28,7 @@ testing_tags.vec: tagged_items.vec
 	./split_tags.sh ./tagged_items.vec training_tags.vec testing_tags.vec ${TRAINING_PERCENT}
 
 tags_listed.vec: listed.vec training_tags.vec
-	./join_csv.py training_tags.vec listed.vec:0:0 > tags_listed.vec
+	./join_csv.py --output tags_listed.vec training_tags.vec listed.vec:0:0
 
 theta.mat: tags_listed.vec tags.vec
 	octave ./calc_theta.m  ./tags_listed.vec ${TAGS} ${MAX_ITER} theta.mat
