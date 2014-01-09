@@ -1,4 +1,4 @@
-from join_csv import create_table, create_index
+from join_csv import table
 from listed import get_item_iter
 from os import rename
 from sys import stdout
@@ -13,8 +13,7 @@ parser.add_argument('fields', help='items')
 parser.add_argument('items', help='items')
 def main():
     args = parser.parse_args()
-    words_f = open(args.words, 'r')
-    top_words = create_table(words_f)
+    top_words = table(args.words)
     items = get_item_iter(args.items)
     if args.output:
         out_h = NamedTemporaryFile()
@@ -24,7 +23,7 @@ def main():
         item_words = get_words(args.fields.split(','), item)
         norm_item_words = list(normalize_words(item_words))
         item_vec = [str(item['id'])]
-        for idx, word in top_words:
+        for idx, word in top_words.cursor():
             if word in norm_item_words:
                 item_vec.append("1")
             else:
