@@ -16,7 +16,7 @@ listed.vec: top_words.vec
 	python ./vectorize.py --output listed.vec ./top_words.vec title,description ./all_items_listed.csv
 
 tags.vec:
-	python ./tags.py ./tagged_items.csv | sort -n  > tags.vec
+	python ./tags.py --output tags.vec ./tagged_items.csv
 
 tagged_items.vec:
 	python ./tag.py ./tagged_items.csv > tagged_items.vec
