@@ -6,6 +6,7 @@ from csv import reader, writer
 from sys import stdout
 from tempfile import NamedTemporaryFile
 from os import rename
+from listutils import flatten
 
 def join_arg(string):
     try:

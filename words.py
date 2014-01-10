@@ -1,5 +1,6 @@
 import argparse
-from listed import get_item_iter, flatten
+from listed import get_item_iter
+from listutils import flatten
 import re
 from stemming.porter2 import stem
 from itertools import imap
