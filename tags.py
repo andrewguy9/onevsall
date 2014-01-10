@@ -2,11 +2,11 @@ from sys import stdout
 from os import rename
 from tempfile import NamedTemporaryFile
 import argparse
-from join_csv import table
+from join_csv import file_table
 
 def get_tags(path):
     tags = set()
-    for item in table(path).dict_cursor():
+    for item in file_table(path).dict_cursor():
         tags.add(item['tag'])
     return sorted(tags)
 

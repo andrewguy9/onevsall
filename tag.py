@@ -3,10 +3,10 @@ from os import rename
 from tempfile import NamedTemporaryFile
 from tags import get_tags
 import argparse
-from join_csv import table
+from join_csv import file_table
 
 def get_tags_iter(path, tags):
-    for item in table(path).dict_cursor():
+    for item in file_table(path).dict_cursor():
         tag = item['tag']
         tag_id = tags[tag]
         vec = [item['id'], str(tag_id)]

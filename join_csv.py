@@ -76,7 +76,7 @@ def left_join(left, left_key, right_index, right_key):
 
 def main():
     args = parser.parse_args()
-    accum = table(args.base)
+    accum = file_table(args.base)
     if args.output:
         out_h = NamedTemporaryFile()
     else:
@@ -84,7 +84,7 @@ def main():
     # print "***Start table***"
     # accum.write(stdout)
     for (table_name, left_index, right_index) in args.join_arg:
-        right = table(table_name)
+        right = file_table(table_name)
         # print "***right table ***"
         # right.write(stdout)
         index = right.index(right_index)

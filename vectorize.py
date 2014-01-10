@@ -1,4 +1,4 @@
-from join_csv import table
+from join_csv import file_table
 from listed import get_item_iter
 from os import rename
 from sys import stdout
@@ -13,7 +13,7 @@ parser.add_argument('fields', help='items')
 parser.add_argument('items', help='items')
 def main():
     args = parser.parse_args()
-    top_words = table(args.words)
+    top_words = file_table(args.words)
     items = get_item_iter(args.items)
     if args.output:
         out_h = NamedTemporaryFile()
