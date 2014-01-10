@@ -20,3 +20,6 @@ def tail(c):
     for e in i:
         yield e
 
+def head(c):
+    i = iter(c)
+    yield i.next()
