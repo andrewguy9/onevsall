@@ -1,13 +1,9 @@
-from csv import reader
+from join_csv import table
 
 def get_item_iter(path):
-    f = open(path, 'r')
-    r = reader(f)
-    items = tail(r)
-    for item in items:
-        (id, title, description, price) = item
-        d = {'id':id, 'title':title, 'description':description, 'price':price}
-        yield d
+    items = table(path)
+    for item in items.dict_cursor():
+        yield item
 
 def flatten(ii):
     for i in ii:
