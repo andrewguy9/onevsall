@@ -26,23 +26,22 @@ parser.add_argument("base", help="table to start with")
 parser.add_argument("join_arg", type=join_arg, nargs='*', help="file.csv:left_key_index:right_key_index")
 
 class table:
-    def __init__(self, path):
-        self.path = path
+
+    def get_iter(self):
+        raise NotImplemented()
 
     def cursor(self):
-        with open(self.path, 'r') as fd:
-            r = reader(fd)
-            for record in r:
-                yield record
+        i = self.get_iter()
+        for record in i:
+            yield record
 
     def dict_cursor(self):
-        with open(self.path, 'r') as fd:
-            r = reader(fd)
-            headers = r.next()
-            index_field = list(enumerate(headers))
-            for row in r:
-                dict_row = {field: row[index] for (index, field) in index_field}
-                yield dict_row
+        i = self.get_iter()
+        headers = i.next()
+        index_field = list(enumerate(headers))
+        for row in i:
+            dict_row = {field: row[index] for (index, field) in index_field}
+            yield dict_row
 
     def index(self, key_index):
         index = {}
@@ -58,21 +57,34 @@ class table:
         for record in self.cursor():
             out.writerow(map(str, record))
 
-def left_join(left, left_key, right_index, right_key):
-    accum = []
-    # print "&&& running key %d &&&" % left_key
+class file_table(table):
+    def __init__(self, path):
+        self.path = path
+
+    def get_iter(self):
+        fd = open(self.path, 'r')
+        r = reader(fd)
+        return r
+
+class list_table(table):
+    table = []
+
+    def __init__(self, input_):
+        self.table = [tuple(x) for x in input_]
+
+    def get_iter(self):
+        return self.table
+
+def merge_records(left, left_key, right_index):
     for record in left.cursor():
-        row = []
-        row += record
         key = record[left_key]
-        # print "&&& For this record, '%s' is the key &&&" % key
-        right_record = right_index[key]
-        before = right_record[:right_key]
-        after = right_record[(right_key+1):]
-        row.extend(before+after)
-        # print "==== This row is now ", row
-        accum.extend([row])
-    return accum
+        right = right_index[key]
+        yield flatten([record, right])
+
+def left_join(left, left_key, right_index):
+    combined = merge_records(left, left_key, right_index)
+    table = list_table(combined)
+    return table
 
 def main():
     args = parser.parse_args()
@@ -88,10 +100,10 @@ def main():
         # print "***right table ***"
         # right.write(stdout)
         index = right.index(right_index)
-        accum = left_join(accum, left_index, index, right_index)  # TODO FIX JOIN.
+        accum = left_join(accum, left_index, index)
         # print "***joined table***"
         # accum.write(stdout)
-    accum.write(stdout)
+    accum.write(out_h)
     if out_h != stdout:
         rename(out_h.name, args.output)
 
