@@ -5,7 +5,7 @@ import re
 from stemming.porter2 import stem
 from itertools import imap
 from tempfile import NamedTemporaryFile
-from os import rename
+from os import link
 from sys import stdout
 
 def get_words(fields, item):
@@ -74,7 +74,7 @@ def main():
     for (idx, word) in zip(range(len(top_words)), top_words):
         print >>out_h, "%s,%s" % (idx, word)
     if out_h != stdout:
-        rename(out_h.name, args.output)
+        link(out_h.name, args.output)
 
 
 parser = argparse.ArgumentParser()
