@@ -1,5 +1,5 @@
 from sys import stdout
-from os import rename
+from os import link
 from tempfile import NamedTemporaryFile
 from tags import get_tags
 import argparse
@@ -26,7 +26,7 @@ def main():
     for item in get_tags_iter(args.tags, tags_dict):
         print >>out_h, ",".join(item)
     if out_h != stdout:
-        rename(out_h.name, args.output)
+        link(out_h.name, args.output)
 
 if __name__ == '__main__':
     main()

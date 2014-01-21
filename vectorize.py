@@ -1,6 +1,6 @@
 from join_csv import file_table
 from listed import get_item_iter
-from os import rename
+from os import link
 from sys import stdout
 from tempfile import NamedTemporaryFile
 from words import get_words, normalize_words
@@ -30,7 +30,7 @@ def main():
                 item_vec.append("0")
         print >>out_h, ",".join(item_vec)
     if out_h != stdout:
-        rename(out_h.name, args.output)
+        link(out_h.name, args.output)
 
 if __name__ == '__main__':
     main()
