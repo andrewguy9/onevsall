@@ -6,7 +6,7 @@ predictions_file = args{3}
 load("-text", theta_file)
 
 data = csvread(items_file);
-fprintf("Data Dims");
+fprintf("Data Dims\n");
 [rows, cols] = size(data)
 
 ids = data(:,  1       ); 
