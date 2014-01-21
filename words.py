@@ -71,8 +71,8 @@ def main():
         out_h = NamedTemporaryFile()
     else:
         out_h = stdout
-    for (idx, word) in zip(range(len(top_words)), top_words):
-        print >>out_h, "%s,%s" % (idx, word)
+    for idx, word in enumerate(top_words):
+        print >>out_h, "%s,%s" % (idx, " ".join(list(word)))
     if out_h != stdout:
         link(out_h.name, args.output)
 
