@@ -1,6 +1,6 @@
 NUM_FEATURES=1000
-MAX_ITER=400
-TRAINING_PERCENT=100
+MAX_ITER=800
+TRAINING_PERCENT=80
 TAGS=`wc -l tags.vec  | awk '{print $$1}'`
 
 all: check_predictions.debug
