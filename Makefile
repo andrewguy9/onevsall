@@ -38,3 +38,4 @@ item_predictions.vec: theta.mat listed.vec
 
 check_predictions.debug: item_predictions.vec testing_tags.vec
 	./join_csv.py testing_tags.vec item_predictions.vec:0:0 | tr "," " " | awk 'BEGIN{good=0; bad = 0}{if($$2==$$3){good++}else{bad++}}END{print good,bad,int(100*good/(good+bad))"%"}' | tee check_predictions.debug
+	./join_csv.py testing_tags.vec item_predictions.vec:0:0 | perl -ne 'chomp; @s=split(",", $$_); if($$s[1]==$$s[2]){$$good++;}else{$$bad++;}BEGIN{$$good=0; $$bad = 0;}END{$$ratio = $$good/($$good+$$bad); print "$$good $$bad $$ratio\n"}'
