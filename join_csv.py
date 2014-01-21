@@ -5,8 +5,7 @@ from argparse import ArgumentParser
 from csv import reader, writer
 from sys import stdout
 from tempfile import NamedTemporaryFile
-from os import rename
-from listutils import flatten
+from os import link
 
 def join_arg(string):
     try:
@@ -25,13 +24,26 @@ parser.add_argument('--output', help='file to write to')
 parser.add_argument("base", help="table to start with")
 parser.add_argument("join_arg", type=join_arg, nargs='*', help="file.csv:left_key_index:right_key_index")
 
-class table:
+class table(object):
+
+    def __init__(self, header):
+        self.has_headers = header
 
     def get_iter(self):
         raise NotImplemented()
 
+    def get_headers(self):
+        if self.has_headers:
+            i = self.get_iter()
+            headers = i.next()
+            return headers
+        else:
+            return None
+
     def cursor(self):
         i = self.get_iter()
+        if self.has_headers:
+            i.next()
         for record in i:
             yield record
 
@@ -49,7 +61,7 @@ class table:
             key = record[key_index]
             if key in index:
                 raise ValueError("Key %s is not unique" % key)
-            index[key] = record
+            index[key] = list(record[0:key_index] + record[key_index+1:])
         return index
 
     def write(self, f):
@@ -58,7 +70,8 @@ class table:
             out.writerow(map(str, record))
 
 class file_table(table):
-    def __init__(self, path):
+    def __init__(self, path, has_headers=True):
+        super(file_table, self).__init__(has_headers)
         self.path = path
 
     def get_iter(self):
@@ -69,17 +82,23 @@ class file_table(table):
 class list_table(table):
     table = []
 
-    def __init__(self, input_):
-        self.table = [tuple(x) for x in input_]
+    def __init__(self, input_, has_headers=True):
+        super(list_table, self).__init__(has_headers)
+        self.table = [list(x) for x in input_]
 
     def get_iter(self):
-        return self.table
+        return iter(self.table)
 
 def merge_records(left, left_key, right_index):
     for record in left.cursor():
         key = record[left_key]
         right = right_index[key]
-        yield flatten([record, right])
+        try:
+            yield record + right
+        except TypeError as e:
+            print record
+            print right
+            raise e
 
 def left_join(left, left_key, right_index):
     combined = merge_records(left, left_key, right_index)
@@ -88,7 +107,7 @@ def left_join(left, left_key, right_index):
 
 def main():
     args = parser.parse_args()
-    accum = file_table(args.base)
+    accum = file_table(args.base, False)  # TODO Does this table have headers?
     if args.output:
         out_h = NamedTemporaryFile()
     else:
@@ -96,7 +115,7 @@ def main():
     # print "***Start table***"
     # accum.write(stdout)
     for (table_name, left_index, right_index) in args.join_arg:
-        right = file_table(table_name)
+        right = file_table(table_name, False)  # TODO Does this table have headers?
         # print "***right table ***"
         # right.write(stdout)
         index = right.index(right_index)
@@ -105,7 +124,7 @@ def main():
         # accum.write(stdout)
     accum.write(out_h)
     if out_h != stdout:
-        rename(out_h.name, args.output)
+        link(out_h.name, args.output)
 
 if __name__ == '__main__':
     main()
